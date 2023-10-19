@@ -39,6 +39,7 @@ SimplePlanetSystem::SimplePlanetSystem() {}
 void SimplePlanetSystem::initialise(float moonScale, float moonOrbitDistance, float moonOrbitSpeed, float moonRotationSpeed) {
 
 	// Load textures
+	// Textures from Master of Orion II: Battle at Antares (https://www.spriters-resource.com/pc_computer/masteroforioniibattleatantares/sheet/206151/)
 	planetTexture = loadTexture(string("Assets\\Textures\\planet01.png"), FIF_PNG);
 	moonTexture = loadTexture(string("Assets\\Textures\\moon01.png"), FIF_PNG);
 
