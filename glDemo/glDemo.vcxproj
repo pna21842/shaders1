@@ -138,23 +138,29 @@
     <ClInclude Include="GLFW\glfw3.h" />
     <ClInclude Include="GLFW\glfw3native.h" />
     <ClInclude Include="GL\glew.h" />
+    <ClInclude Include="PlanetSystem.h" />
+    <ClInclude Include="RandomStars.h" />
     <ClInclude Include="semi-circle-immediate-mode.h" />
     <ClInclude Include="semi-circle-vertexarray.h" />
     <ClInclude Include="star-vbo.h" />
     <ClInclude Include="texture-quad-immediate.h" />
     <ClInclude Include="texture-quad-interleaved.h" />
     <ClInclude Include="texture-quad-vertexarray.h" />
+    <ClInclude Include="TextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arwing.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PlanetSystem.cpp" />
+    <ClCompile Include="RandomStars.cpp" />
     <ClCompile Include="semi-circle-immediate-mode.cpp" />
     <ClCompile Include="semi-circle-vertexarray.cpp" />
     <ClCompile Include="star-vbo.cpp" />
     <ClCompile Include="texture-quad-immediate.cpp" />
     <ClCompile Include="texture-quad-interleaved.cpp" />
     <ClCompile Include="texture-quad-vertexarray.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

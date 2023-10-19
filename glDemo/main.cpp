@@ -1,5 +1,6 @@
 
 #include "core.h"
+#include "TextureLoader.h"
 #include "semi-circle-immediate-mode.h"
 #include "semi-circle-vertexarray.h"
 #include "texture-quad-immediate.h"
@@ -7,8 +8,11 @@
 #include "texture-quad-interleaved.h"
 #include "arwing.h"
 #include "star-vbo.h"
+#include "RandomStars.h"
+#include "PlanetSystem.h"
 
 using namespace std;
+using namespace glm;
 
 
 // global variables
@@ -16,6 +20,11 @@ using namespace std;
 // Example exture object
 GLuint playerTexture;
 
+vec3 offset = vec3(0.5f, 0.5f, 0.5f);
+mat4 T;
+
+StarField stars = StarField();
+SimplePlanetSystem planets = SimplePlanetSystem();
 
 // Window size
 const unsigned int initWidth = 512;
@@ -23,7 +32,6 @@ const unsigned int initHeight = 512;
 
 // Function prototypes
 void renderScene();
-GLuint loadTexture(string filename, FREE_IMAGE_FORMAT srcImageType);
 void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
 void updateScene();
@@ -72,17 +80,22 @@ int main() {
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
-	gluOrtho2D(-10.0f, 10.0f, -10.0f, 10.0f);
+
+	glMatrixMode(GL_PROJECTION);
+	//gluOrtho2D(-10.0f, 10.0f, -10.0f, 10.0f);
+	gluOrtho2D(-5.0f, 5.0f, -5.0f, 5.0f);
+
+	glMatrixMode(GL_MODELVIEW);
 
 
 	//
-	// Setup textures
+	// Setup Textures, VBOs and other scene objects
 	//
 
 	playerTexture = loadTexture(string("Assets\\Textures\\player1_ship.png"), FIF_PNG);
 
-	// Setup VBOs
-	setupStarVBO();
+	stars.initialiseStarfield(200);
+	planets.initialise(0.5f, 3.0f, radians(0.01f), radians(0.05f));
 
 
 	//
@@ -114,6 +127,14 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//static float theta = 0.0f;
+	//offset.x = cosf(theta);
+	//theta += glm::radians(1.0f) * 0.01f;
+
+	//T = glm::translate(identity<mat4>(), offset);
+	//glLoadMatrixf((GLfloat*)(&T));
+
+
 	//drawSemiCircleImmediate();
 	//drawSemiCircleVertexArray();
 	//drawTexturedQuadImmediate(playerTexture);
@@ -121,66 +142,12 @@ void renderScene()
 	//drawTextureQuadInterleaved(playerTexture);
 	//drawArwingImmediate();
 	//drawArwingVertexArray();
-	drawStarVBO();
+
+	//stars.render();
+	planets.render();
 }
 
 
-// Utility function to load an image using FreeImage, convert to 32 bits-per-pixel (bpp) and setup and return a new texture object based on this.
-GLuint loadTexture(string filename, FREE_IMAGE_FORMAT srcImageType) {
-
-	// Load and validate bitmap
-	FIBITMAP* loadedBitmap = FreeImage_Load(srcImageType, filename.c_str(), BMP_DEFAULT);
-
-	if (!loadedBitmap) {
-
-		cout << "FreeImage: Could not load image " << filename << endl;
-		return 0;
-	}
-
-	// Comvert to RGBA format
-	FIBITMAP* bitmap32bpp = FreeImage_ConvertTo32Bits(loadedBitmap);
-	FreeImage_Unload(loadedBitmap);
-
-	if (!bitmap32bpp) {
-
-		cout << "FreeImage: Conversion to 32 bits unsuccessful for image " << filename << endl;
-		return 0;
-	}
-
-	// Image loaded and converted - setup new texture object
-	GLuint newTexture = 0;
-
-	// If image loaded, setup new texture object in OpenGL
-	glGenTextures(1, &newTexture); // can create more than 1!
-
-	if (newTexture) {
-
-		glBindTexture(GL_TEXTURE_2D, newTexture);
-
-		// Setup texture image properties
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_RGBA,
-			FreeImage_GetWidth(bitmap32bpp),
-			FreeImage_GetHeight(bitmap32bpp),
-			0,
-			GL_BGRA,
-			GL_UNSIGNED_BYTE,
-			FreeImage_GetBits(bitmap32bpp));
-
-		// Setup texture filter and wrap properties
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	}
-
-	// Once the texture has been setup, the image data is copied into OpenGL.  We no longer need the originally loaded image
-	FreeImage_Unload(bitmap32bpp);
-
-	return newTexture;
-}
 
 
 // Function to call when window resized
@@ -215,5 +182,7 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 
 // Function called to animate elements in the scene
 void updateScene() {
+
+	planets.update();
 }
 
