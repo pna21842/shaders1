@@ -30,5 +30,5 @@ public:
 	// Initialisation, update (called per-frame) and render functions
 	void initialise(float moonScale, float moonOrbitDistance, float moonOrbitSpeed, float moonRotationSpeed);
 	void update();
-	void render();
+	void render(glm::mat4 currentTransform);
 };

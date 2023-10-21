@@ -33,24 +33,6 @@
     <ClInclude Include="FreeImage\FreeImagePlus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="semi-circle-immediate-mode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="semi-circle-vertexarray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="texture-quad-immediate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="texture-quad-vertexarray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="texture-quad-interleaved.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="arwing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="star-vbo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -69,24 +51,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="core.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="semi-circle-immediate-mode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="semi-circle-vertexarray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="texture-quad-immediate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="texture-quad-vertexarray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="texture-quad-interleaved.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="arwing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="star-vbo.cpp">

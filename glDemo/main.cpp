@@ -1,12 +1,6 @@
 
 #include "core.h"
 #include "TextureLoader.h"
-#include "semi-circle-immediate-mode.h"
-#include "semi-circle-vertexarray.h"
-#include "texture-quad-immediate.h"
-#include "texture-quad-vertexarray.h"
-#include "texture-quad-interleaved.h"
-#include "arwing.h"
 #include "star-vbo.h"
 #include "RandomStars.h"
 #include "PlanetSystem.h"
@@ -16,13 +10,6 @@ using namespace glm;
 
 
 // global variables
-
-// Example exture object
-GLuint playerTexture;
-
-vec3 offset = vec3(0.5f, 0.5f, 0.5f);
-mat4 T;
-
 StarField stars = StarField();
 SimplePlanetSystem planets = SimplePlanetSystem();
 
@@ -81,18 +68,11 @@ int main() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
 
-	glMatrixMode(GL_PROJECTION);
-	//gluOrtho2D(-10.0f, 10.0f, -10.0f, 10.0f);
-	gluOrtho2D(-5.0f, 5.0f, -5.0f, 5.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-
-
 	//
 	// Setup Textures, VBOs and other scene objects
 	//
 
-	playerTexture = loadTexture(string("Assets\\Textures\\player1_ship.png"), FIF_PNG);
+	setupStarVBO();
 
 	stars.initialiseStarfield(200);
 	planets.initialise(0.5f, 3.0f, radians(0.01f), radians(0.05f));
@@ -101,18 +81,13 @@ int main() {
 	//
 	// 2. Main loop
 	// 
-	
 
-	// Loop while program is not terminated.
 	while (!glfwWindowShouldClose(window)) {
 
 		updateScene();
 		renderScene();						// Render into the current buffer
 		glfwSwapBuffers(window);			// Displays what was just rendered (using double buffering).
 
-		// Poll events (key presses, mouse events)
-		// glfwWaitEvents();				// Use this if no animation.
-		// glfwWaitEventsTimeout(1.0/60.0);	// Use this to animate at 60 frames/sec (timing is NOT reliable)
 		glfwPollEvents();					// Use this version when animating as fast as possible
 	}
 
@@ -121,30 +96,16 @@ int main() {
 }
 
 
+
 // renderScene - function to render the current scene
 void renderScene()
 {
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//static float theta = 0.0f;
-	//offset.x = cosf(theta);
-	//theta += glm::radians(1.0f) * 0.01f;
+	mat4 orthoProjection = ortho(-8.0f, 8.0f, -8.0f, 8.0f);
 
-	//T = glm::translate(identity<mat4>(), offset);
-	//glLoadMatrixf((GLfloat*)(&T));
-
-
-	//drawSemiCircleImmediate();
-	//drawSemiCircleVertexArray();
-	//drawTexturedQuadImmediate(playerTexture);
-	//drawTextureQuadVertexArray(playerTexture);
-	//drawTextureQuadInterleaved(playerTexture);
-	//drawArwingImmediate();
-	//drawArwingVertexArray();
-
-	//stars.render();
-	planets.render();
+	stars.render(orthoProjection);
 }
 
 
@@ -183,6 +144,5 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 // Function called to animate elements in the scene
 void updateScene() {
 
-	planets.update();
 }
 

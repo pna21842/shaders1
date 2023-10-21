@@ -35,7 +35,9 @@ static GLuint indices[] = { 0, 2, 1, 0, 3, 2 };
 SimplePlanetSystem::SimplePlanetSystem() {}
 
 
-// Initialisation, update (called per-frame) and render functions
+// Initialisation, update (called per-frame) and render functions...
+
+// Initialise planet system with given properties for size and orbit distance / speed.
 void SimplePlanetSystem::initialise(float moonScale, float moonOrbitDistance, float moonOrbitSpeed, float moonRotationSpeed) {
 
 	// Load textures
@@ -71,6 +73,7 @@ void SimplePlanetSystem::initialise(float moonScale, float moonOrbitDistance, fl
 }
 
 
+// Update is called per-frame in the main update function - we change the orbit and moon rotation values so when we create the matrices at render time they model the new position and orientation of the moon.
 void SimplePlanetSystem::update() {
 
 	moonRotationAngle += moonRotationSpeed;
@@ -78,7 +81,8 @@ void SimplePlanetSystem::update() {
 }
 
 
-void SimplePlanetSystem::render() {
+// Render planets
+void SimplePlanetSystem::render(mat4 currentTransform) {
 
 	// Enable Texturing
 	glEnable(GL_TEXTURE_2D);
@@ -101,17 +105,16 @@ void SimplePlanetSystem::render() {
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 
-	// Transform and render planet
+	// Transform and render planet (use currentTransform parameter directly)
 
 	glBindTexture(GL_TEXTURE_2D, planetTexture);
 
-	mat4 transform = identity<mat4>();
-	glLoadMatrixf((GLfloat*)&transform);
+	glLoadMatrixf((GLfloat*)&currentTransform);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
 
 
-	// Transform and render moon
+	// Transform and render moon (add moon transforms relative to planet)
 
 	glBindTexture(GL_TEXTURE_2D, moonTexture);
 
@@ -120,8 +123,8 @@ void SimplePlanetSystem::render() {
 	mat4 moonTranslation = translate(identity<mat4>(), vec3(moonOrbitDistance, 0.0f, 0.0f));
 	mat4 moonOrbitRotation = rotate(identity<mat4>(), moonOrbitAngle, vec3(0.0f, 0.0f, 1.0f));
 
-	transform = moonOrbitRotation * moonTranslation * moonRotation * moonScaleMatrix;
-	glLoadMatrixf((GLfloat*)&transform);
+	mat4 moonTransform = currentTransform * moonOrbitRotation * moonTranslation * moonRotation * moonScaleMatrix;
+	glLoadMatrixf((GLfloat*)&moonTransform);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
 

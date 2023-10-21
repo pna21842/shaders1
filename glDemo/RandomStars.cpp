@@ -53,16 +53,17 @@ void StarField::initialiseStarfield(GLuint numStars) {
 	}
 }
 
-void StarField::render() {
+// Draw star field.  For each star we create a new transform matrix based on the instance position and size.
+void StarField::render(mat4 currentTransform) {
 
 	for (int i = 0; i < stars.size(); i++) {
 
 		mat4 translateMatrix = translate(identity<mat4>(), vec3(stars[i].position.x, stars[i].position.y, stars[i].position.z));
 		mat4 scaleMatrix = scale(identity<mat4>(), vec3(stars[i].size, stars[i].size, 1.0f));
 
-		mat4 T = translateMatrix * scaleMatrix;
-
+		mat4 T = currentTransform * translateMatrix * scaleMatrix;
 		glLoadMatrixf((GLfloat*)(&T));
+
 		drawStarVBO();
 	}
 }
