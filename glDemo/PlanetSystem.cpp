@@ -1,34 +1,11 @@
 
 #include "PlanetSystem.h"
 #include "TextureLoader.h"
+#include "TextureQuad.h"
 
 
 using namespace std;
 using namespace glm;
-
-
-#pragma region Geometry data to setup VBOs for rendering - use triangles not quads here
-
-static float positions[] = {
-
-	-1.0f, 1.0f,
-	1.0f, 1.0f,
-	1.0f, -1.0f,
-	-1.0f, -1.0f
-};
-
-static float texCoords[] = {
-
-	0.0f, 1.0f,
-	1.0f, 1.0f,
-	1.0f, 0.0f,
-	0.0f, 0.0f
-};
-
-// Indices for 2 triangles
-static GLuint indices[] = { 0, 2, 1, 0, 3, 2 };
-
-#pragma endregion
 
 
 // Constructor
@@ -38,98 +15,76 @@ SimplePlanetSystem::SimplePlanetSystem() {}
 // Initialisation, update (called per-frame) and render functions...
 
 // Initialise planet system with given properties for size and orbit distance / speed.
-void SimplePlanetSystem::initialise(float moonScale, float moonOrbitDistance, float moonOrbitSpeed, float moonRotationSpeed) {
+void SimplePlanetSystem::initialise() {
 
 	// Load textures
-	// Textures from Master of Orion II: Battle at Antares (https://www.spriters-resource.com/pc_computer/masteroforioniibattleatantares/sheet/206151/)
-	planetTexture = loadTexture(string("Assets\\Textures\\planet01.png"), FIF_PNG);
-	moonTexture = loadTexture(string("Assets\\Textures\\moon01.png"), FIF_PNG);
+	
+	// Sun texture from NASA
+	planetTexture[0] = loadTexture(string("Assets\\Textures\\sun.png"), FIF_PNG);
+	// Planet Textures from Master of Orion II: Battle at Antares (https://www.spriters-resource.com/pc_computer/masteroforioniibattleatantares/sheet/206151/)
+	planetTexture[1] = loadTexture(string("Assets\\Textures\\planet01.png"), FIF_PNG);
+	planetTexture[2] = loadTexture(string("Assets\\Textures\\planet02.png"), FIF_PNG);
+	planetTexture[3] = loadTexture(string("Assets\\Textures\\planet03.png"), FIF_PNG);
+	planetTexture[4] = loadTexture(string("Assets\\Textures\\planet04.png"), FIF_PNG);
+	planetTexture[5] = loadTexture(string("Assets\\Textures\\planet05.png"), FIF_PNG);
+	planetTexture[6] = loadTexture(string("Assets\\Textures\\planet06.png"), FIF_PNG);
+	planetTexture[7] = loadTexture(string("Assets\\Textures\\planet07.png"), FIF_PNG);
+	planetTexture[8] = loadTexture(string("Assets\\Textures\\planet08.png"), FIF_PNG);
+	planetTexture[9] = loadTexture(string("Assets\\Textures\\planet09.png"), FIF_PNG);
+	planetTexture[10] = loadTexture(string("Assets\\Textures\\planet10.png"), FIF_PNG);
 
-	// Setup VBOs for geometry
-	glGenBuffers(1, &posVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, posVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+	// Setup orbiting bodies...
+	
+	satelliteSystem = vector<PlanetaryBody>(4);
 
-	glGenBuffers(1, &texCoordVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &indicesVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Unbind buffers once done
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	// Initialise moon orbit parameters
-	moonRotationAngle = 0.0f;
-	moonOrbitAngle = 0.0f;
-	this->moonScale = moonScale;
-	this->moonOrbitDistance = moonOrbitDistance;
-	this->moonOrbitSpeed = moonOrbitSpeed;
-	this->moonRotationSpeed = moonRotationSpeed;
+	satelliteSystem[0] = PlanetaryBody(planetTexture[0], 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f);
+	satelliteSystem[1] = PlanetaryBody(planetTexture[1], 3.0f, 0.0f, 0.0f, 0.5f, radians(0.05f), radians(0.02f));
+	satelliteSystem[2] = PlanetaryBody(planetTexture[2], 7.0f, radians(90.0f), 0.0f, 0.7f, radians(0.005f), radians(0.01f));
+	satelliteSystem[3] = PlanetaryBody(planetTexture[6], 11.0f, radians(-45.0f), 0.0f, 1.5f, radians(0.0075f), radians(0.1f));
 }
+
 
 
 // Update is called per-frame in the main update function - we change the orbit and moon rotation values so when we create the matrices at render time they model the new position and orientation of the moon.
 void SimplePlanetSystem::update() {
 
-	moonRotationAngle += moonRotationSpeed;
-	moonOrbitAngle += moonOrbitSpeed;
+	for (int i = 0; i < satelliteSystem.size(); i++) {
+		satelliteSystem[i].update();
+	}
 }
 
 
 // Render planets
-void SimplePlanetSystem::render(mat4 currentTransform) {
+void SimplePlanetSystem::render(mat4 cameraTransform) {
 
-	// Enable Texturing
+	// Enable Texturing and alpha blending for planet rendering
 	glEnable(GL_TEXTURE_2D);
-	
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Setup VBOs ready for rendering
-	glBindBuffer(GL_ARRAY_BUFFER, posVBO);
-	glVertexPointer(2, GL_FLOAT, 0, (GLvoid*)0);
+	textureQuadPreRender();
 
-	glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
-	glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)0);
+	// Transform and render each planet (use currentTransform parameter directly)
 
-	// Bind (and leave bound) the index array for drawing
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVBO);
+	for (int i = 0; i < satelliteSystem.size(); i++) {
 
-	// Declare which arrays are needed for the semi-circle object
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glBindTexture(GL_TEXTURE_2D, satelliteSystem[i].textureID);
 
+		mat4 scale = glm::scale(identity<mat4>(), vec3(satelliteSystem[i].scale, satelliteSystem[i].scale, 1.0f));
+		mat4 rotation = rotate(identity<mat4>(), satelliteSystem[i].rotationAngle, vec3(0.0f, 0.0f, 1.0f));
+		mat4 translate = glm::translate(identity<mat4>(), vec3(satelliteSystem[i].orbitDistance, 0.0f, 0.0f));
+		mat4 orbitRotation = rotate(identity<mat4>(), satelliteSystem[i].orbitAngle, vec3(0.0f, 0.0f, 1.0f));
 
-	// Transform and render planet (use currentTransform parameter directly)
+		mat4 T = cameraTransform * orbitRotation * translate * rotation * scale;
+		glLoadMatrixf((GLfloat*)&T);
 
-	glBindTexture(GL_TEXTURE_2D, planetTexture);
+		textureQuadRender();
+	}
 
-	glLoadMatrixf((GLfloat*)&currentTransform);
+	textureQuadPostRender();
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
-
-
-	// Transform and render moon (add moon transforms relative to planet)
-
-	glBindTexture(GL_TEXTURE_2D, moonTexture);
-
-	mat4 moonScaleMatrix = scale(identity<mat4>(), vec3(moonScale, moonScale, 1.0f));
-	mat4 moonRotation = rotate(identity<mat4>(), moonRotationAngle, vec3(0.0f, 0.0f, 1.0f));
-	mat4 moonTranslation = translate(identity<mat4>(), vec3(moonOrbitDistance, 0.0f, 0.0f));
-	mat4 moonOrbitRotation = rotate(identity<mat4>(), moonOrbitAngle, vec3(0.0f, 0.0f, 1.0f));
-
-	mat4 moonTransform = currentTransform * moonOrbitRotation * moonTranslation * moonRotation * moonScaleMatrix;
-	glLoadMatrixf((GLfloat*)&moonTransform);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
-
-
-	// Unbind buffers once done
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	// Disable texturing and alpha blending
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
 }

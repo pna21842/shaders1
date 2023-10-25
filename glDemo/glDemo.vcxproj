@@ -141,6 +141,8 @@
     <ClInclude Include="RandomStars.h" />
     <ClInclude Include="star-vbo.h" />
     <ClInclude Include="TextureLoader.h" />
+    <ClInclude Include="TextureQuad.h" />
+    <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp" />
@@ -149,6 +151,8 @@
     <ClCompile Include="RandomStars.cpp" />
     <ClCompile Include="star-vbo.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
+    <ClCompile Include="TextureQuad.cpp" />
+    <ClCompile Include="TileMap.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

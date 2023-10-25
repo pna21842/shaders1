@@ -6,21 +6,61 @@
 // Model a simple planet system with a single planet in the centre and a single moon orbiting the planet
 //
 
+
+struct PlanetaryBody {
+
+	GLuint	textureID;
+
+	float	orbitDistance;
+	float	orbitAngle;
+
+	float	rotationAngle;
+	float	scale;
+
+	float	orbitSpeed;
+	float	rotationSpeed;
+
+	// Constructors
+
+	PlanetaryBody() {
+
+		textureID = 0;
+		orbitDistance = 0.0f;
+		orbitAngle = 0.0f;
+		rotationAngle = 0.0f;
+		scale = 1.0f;
+		orbitSpeed = 0.0f;
+		rotationSpeed = 0.0f;
+	}
+
+	PlanetaryBody(GLuint textureID, float orbitDistance, float orbitAngle, float rotationAngle, float scale, float orbitSpeed, float rotationSpeed) {
+
+		this->textureID = textureID;
+		this->orbitDistance = orbitDistance;
+		this->orbitAngle = orbitAngle;
+		this->rotationAngle = rotationAngle;
+		this->scale = scale;
+		this->orbitSpeed = orbitSpeed;
+		this->rotationSpeed = rotationSpeed;
+	}
+
+	void update() {
+
+		orbitAngle += orbitSpeed;
+		rotationAngle += rotationSpeed;
+	}
+
+	
+};
+
+
 class SimplePlanetSystem {
 
-	GLuint		planetTexture;
-	GLuint		moonTexture;
+	// Array of planet textures
+	GLuint						planetTexture[11];
 
-	GLuint		posVBO;
-	GLuint		texCoordVBO;
-	GLuint		indicesVBO;
-
-	float		moonScale;
-	float		moonRotationAngle;
-	float		moonOrbitAngle;
-	float		moonOrbitDistance;
-	float		moonOrbitSpeed;
-	float		moonRotationSpeed;
+	// Array of orbiting planetary bodies
+	std::vector<PlanetaryBody>	satelliteSystem;
 
 public:
 
@@ -28,7 +68,7 @@ public:
 	SimplePlanetSystem();
 	
 	// Initialisation, update (called per-frame) and render functions
-	void initialise(float moonScale, float moonOrbitDistance, float moonOrbitSpeed, float moonRotationSpeed);
+	void initialise();
 	void update();
-	void render(glm::mat4 currentTransform);
+	void render(glm::mat4 cameraTransform);
 };
