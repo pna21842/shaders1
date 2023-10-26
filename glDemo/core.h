@@ -28,3 +28,6 @@
 #include "glm\mat4x4.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include "FreeImage\\FreeImage.h"
+#include <assimp/cimport.h>        // Plain-C interface
+#include <assimp/scene.h>          // Output data structure
+#include <assimp/postprocess.h>    // Post processing flags

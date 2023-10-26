@@ -45,6 +45,32 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 void updateScene();
 
 
+//
+// Test import
+//
+
+bool testAssetImport(const char* pFile) {
+	
+	const struct aiScene* scene = aiImportFile(pFile,
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_SortByPType);
+
+	// If the import failed, report it
+	if (!scene) {
+		cout << aiGetErrorString() << endl;
+		return false;
+	}
+
+	// Now we can access the file's contents...
+
+	// Once done, release all resources associated with this import
+	aiReleaseImport(scene);
+	return true;
+}
+
+
 int main() {
 
 	//
@@ -101,6 +127,7 @@ int main() {
 	playerSpriteTexture = loadTexture(string("Assets\\Textures\\player1_ship.png"), FIF_PNG);
 	backgroundTexture = loadTexture(string("Assets\\Textures\\stars.jpg"), FIF_JPEG);
 
+	testAssetImport("Assets\\duck\\rubber_duck_toy_4k.obj");
 
 	//
 	// 2. Main loop
