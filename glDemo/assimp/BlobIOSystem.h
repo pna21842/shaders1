@@ -50,10 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma GCC system_header
 #endif
 
-#include <assimp/cexport.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOStream.hpp>
-#include <assimp/IOSystem.hpp>
+#include "assimp\cexport.h"
+#include "assimp\DefaultLogger.hpp"
+#include "assimp\IOStream.hpp"
+#include "assimp\IOSystem.hpp"
 #include <cstdint>
 #include <set>
 #include <vector>
