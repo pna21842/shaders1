@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma GCC system_header
 #endif
 
-#include "assimp\DefaultIOStream.h"
-#include "assimp\TinyFormatter.h"
+#include <assimp/DefaultIOStream.h>
+#include <assimp/TinyFormatter.h>
 #include <stdexcept>
 
 using std::runtime_error;

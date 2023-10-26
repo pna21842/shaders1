@@ -50,9 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma GCC system_header
 #endif
 
-#include "assimp\StringComparison.h"
-#include "assimp\StringUtils.h"
-#include "assimp\defs.h"
+#include <assimp/StringComparison.h>
+#include <assimp/StringUtils.h>
+#include <assimp/defs.h>
 
 #include <vector>
 #include <algorithm>

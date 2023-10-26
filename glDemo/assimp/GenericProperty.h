@@ -47,9 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #    pragma GCC system_header
 #endif
 
-#include "assimp\Hash.h"
-#include "assimp\ai_assert.h"
-#include "assimp\Importer.hpp"
+#include <assimp/Hash.h>
+#include <assimp/ai_assert.h>
+#include <assimp/Importer.hpp>
 
 #include <map>
 
