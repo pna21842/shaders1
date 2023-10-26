@@ -7,6 +7,7 @@
 #pragma comment(lib,"lib\\glew32s.lib")
 #pragma comment(lib,"lib\\glew32.lib")
 #pragma comment(lib,"lib\\FreeImage.lib")
+#pragma comment(lib,"lib\\assimp-vc143-mt.lib")
 
 #define GLEW_STATIC
 #include "GL/glew.h" 
