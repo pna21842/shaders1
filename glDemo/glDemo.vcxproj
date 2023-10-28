@@ -136,13 +136,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AIMesh.h" />
+    <ClInclude Include="ArcballCamera.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="FreeImage\FreeImage.h" />
     <ClInclude Include="FreeImage\FreeImagePlus.h" />
     <ClInclude Include="GLFW\glfw3.h" />
     <ClInclude Include="GLFW\glfw3native.h" />
     <ClInclude Include="GL\glew.h" />
     <ClInclude Include="PlanetSystem.h" />
+    <ClInclude Include="PrincipleAxes.h" />
     <ClInclude Include="RandomStars.h" />
     <ClInclude Include="star-vbo.h" />
     <ClInclude Include="TextureLoader.h" />
@@ -150,9 +154,13 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AIMesh.cpp" />
+    <ClCompile Include="ArcballCamera.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlanetSystem.cpp" />
+    <ClCompile Include="PrincipleAxes.cpp" />
     <ClCompile Include="RandomStars.cpp" />
     <ClCompile Include="star-vbo.cpp" />
     <ClCompile Include="TextureLoader.cpp" />

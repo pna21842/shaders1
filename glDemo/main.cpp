@@ -1,74 +1,47 @@
 
 #include "core.h"
 #include "TextureLoader.h"
-#include "star-vbo.h"
-#include "RandomStars.h"
-#include "PlanetSystem.h"
-#include "TextureQuad.h"
+#include "ArcballCamera.h"
+#include "PrincipleAxes.h"
+#include "AIMesh.h"
+#include "Cube.h"
 
 
 using namespace std;
 using namespace glm;
 
 
-// global variables
-SimplePlanetSystem planets = SimplePlanetSystem();
+#pragma region Global variables
 
-GLuint backgroundTexture = 0;
+// Main camera
+ArcballCamera* mainCamera = nullptr;
 
-// Player variables
-vec2 playerPos = vec2(0.0f, 0.0f);
-vec2 playerVelocity = vec2(0.0f, 0.0f);
-float playerOrientation = 0.0f; // orientation in degrees
-GLuint playerSpriteTexture = 0;
+// Mouse tracking
+bool				mouseDown = false;
+double				prevMouseX, prevMouseY;
 
-// Camera variables
-float cameraZoom = 1.0f;
-vec2 cameraPos = vec2(0.0f, 0.0f);
-
-// Keyboard input state
-bool zoomInPressed = false;
-bool zoomOutPressed = false;
-bool rotateLeftPressed = false;
-bool rotateRightPressed = false;
-bool acceleratePressed = false;
-bool deceleratePressed = false;
+// Scene objects
+CGPrincipleAxes* principleAxes = nullptr;
+Cube* cube = nullptr;
+AIMesh* creatureMesh = nullptr;
+AIMesh* planetMesh = nullptr;
 
 // Window size
 const unsigned int initWidth = 512;
 const unsigned int initHeight = 512;
 
+#pragma endregion
+
+
 // Function prototypes
 void renderScene();
+void updateScene();
 void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
-void updateScene();
-
-
-//
-// Test import
-//
-
-bool testAssetImport(const char* pFile) {
-	
-	const struct aiScene* scene = aiImportFile(pFile,
-		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_SortByPType);
-
-	// If the import failed, report it
-	if (!scene) {
-		cout << aiGetErrorString() << endl;
-		return false;
-	}
-
-	// Now we can access the file's contents...
-
-	// Once done, release all resources associated with this import
-	aiReleaseImport(scene);
-	return true;
-}
+void mouseMoveHandler(GLFWwindow* window, double xpos, double ypos);
+void mouseButtonHandler(GLFWwindow* window, int button, int action, int mods);
+void mouseScrollHandler(GLFWwindow* window, double xoffset, double yoffset);
+void mouseEnterHandler(GLFWwindow* window, int entered);
 
 
 int main() {
@@ -77,6 +50,7 @@ int main() {
 	// 1. Initialisation
 	//
 	
+#pragma region OpenGL and window setup
 
 	// Initialise glfw and setup window
 	glfwInit();
@@ -102,7 +76,10 @@ int main() {
 	// Set callback functions to handle different events
 	glfwSetFramebufferSizeCallback(window, resizeWindow); // resize window callback
 	glfwSetKeyCallback(window, keyboardHandler); // Keyboard input callback
-
+	glfwSetCursorPosCallback(window, mouseMoveHandler);
+	glfwSetMouseButtonCallback(window, mouseButtonHandler);
+	glfwSetScrollCallback(window, mouseScrollHandler);
+	glfwSetCursorEnterCallback(window, mouseEnterHandler);
 
 	// Initialise glew
 	glewInit();
@@ -110,6 +87,9 @@ int main() {
 	
 	// Setup window's initial size
 	resizeWindow(window, initWidth, initHeight);
+
+#pragma endregion
+
 
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
@@ -119,15 +99,23 @@ int main() {
 	// Setup Textures, VBOs and other scene objects
 	//
 
-	setupTextureQuadVBO();
+	mainCamera = new ArcballCamera();
+	
+	principleAxes = new CGPrincipleAxes();
 
-	planets.initialise();
+	cube = new Cube();
 
-	// Setup sprites
-	playerSpriteTexture = loadTexture(string("Assets\\Textures\\player1_ship.png"), FIF_PNG);
-	backgroundTexture = loadTexture(string("Assets\\Textures\\stars.jpg"), FIF_JPEG);
+	creatureMesh = new AIMesh(string("Assets\\beast\\beast.obj"));
+	if (creatureMesh) {
+		creatureMesh->addTexture(string("Assets\\beast\\beast_texture.bmp"), FIF_BMP);
+	}
 
-	testAssetImport("Assets\\duck\\rubber_duck_toy_4k.obj");
+
+	planetMesh = new AIMesh(string("Assets\\gsphere.obj"));
+	if (planetMesh) {
+		planetMesh->addTexture(string("Assets\\Textures\\Hodges_G_MountainRock1.jpg"), FIF_JPEG);
+	}
+
 
 	//
 	// 2. Main loop
@@ -154,70 +142,64 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 orthoProjection = ortho(-cameraZoom, cameraZoom, -cameraZoom, cameraZoom);
-	mat4 viewTransform = glm::translate(identity<mat4>(), vec3(-cameraPos.x, -cameraPos.y, 0.0f));
-	mat4 cameraTransform = orthoProjection * viewTransform;
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_LINE);
+	glDisable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glEnable(GL_DEPTH_TEST);
+
+	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
+
+	// Render principle axes - no modelling transforms so just use cameraTransform
+	glLoadMatrixf((GLfloat*)&cameraTransform);
+	principleAxes->render(cameraTransform);
+
+	// Render cube - no modelling transform so leave cameraTransform set in OpenGL and render
+	cube->render();
 
 
-	//
-	// Render background
-	//
-	mat4 backgroundScale = glm::scale(identity<mat4>(), vec3(20.0f, 20.0f, 1.0f));
-	mat4 T = cameraTransform * backgroundScale;
+#if 0
+	if (creatureMesh) {
 
-	glLoadMatrixf((GLfloat*)&T);
+		// Setup transforms
+		glLoadMatrixf((GLfloat*)&cameraTransform);
 
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
-
-	textureQuadPreRender();
-	textureQuadRender();
-	textureQuadPostRender();
+		creatureMesh->preRender();
+		creatureMesh->render();
+		creatureMesh->postRender();
+	}
 	
+	if (planetMesh) {
 
-	//
-	// Render plants
-	//
-	planets.render(cameraTransform);
+		// Setup transforms
+		mat4 planetTranslate = translate(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
+		mat4 T = cameraTransform * planetTranslate;
+		glLoadMatrixf((GLfloat*)&T);
 
+		planetMesh->preRender();
+		planetMesh->render();
+		planetMesh->postRender();
+	}
+#endif
 
-	//
-	// Render player
-	//
-
-	mat4 playerScale = glm::scale(identity<mat4>(), vec3(0.15f, 0.15f, 1.0f));
-	mat4 playerRotation = glm::rotate(identity<mat4>(), glm::radians(playerOrientation), vec3(0.0f, 0.0f, 1.0f));
-	mat4 playerTranslate = glm::translate(identity<mat4>(), vec3(playerPos.x, playerPos.y, 0.0f));
-
-	mat4 playerModelTransform = playerTranslate * playerRotation * playerScale;
-
-	T = cameraTransform * playerModelTransform;
-
-	glLoadMatrixf((GLfloat*)&T);
-
-
-	// Enable Texturing and alpha blending for player rendering
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, playerSpriteTexture);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	textureQuadPreRender();
-	textureQuadRender();
-	textureQuadPostRender();
-
-	// Disable texturing and alpha blending
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);
 }
 
 
+// Function called to animate elements in the scene
+void updateScene() {
+}
 
+
+#pragma region Event handler functions
 
 // Function to call when window resized
 void resizeWindow(GLFWwindow* window, int width, int height)
 {
+	if (mainCamera) {
+
+		mainCamera->setAspect((float)width / (float)height);
+	}
+
 	glViewport(0, 0, width, height);		// Draw into entire window
 }
 
@@ -234,26 +216,6 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 				glfwSetWindowShouldClose(window, true);
 				break;
 
-			case GLFW_KEY_UP:
-				zoomInPressed = true;
-				break;
-			case GLFW_KEY_DOWN:
-				zoomOutPressed = true;
-				break;
-
-			case GLFW_KEY_W:
-				acceleratePressed = true;
-				break;
-			case GLFW_KEY_S:
-				deceleratePressed = true;
-				break;
-			case GLFW_KEY_A:
-				rotateLeftPressed = true;
-				break;
-			case GLFW_KEY_D:
-				rotateRightPressed = true;
-				break;
-
 			default:
 			{
 			}
@@ -263,26 +225,6 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 		// handle key release events
 		switch (key)
 		{
-			case GLFW_KEY_UP:
-				zoomInPressed = false;
-				break;
-			case GLFW_KEY_DOWN:
-				zoomOutPressed = false;
-				break;
-
-			case GLFW_KEY_W:
-				acceleratePressed = false;
-				break;
-			case GLFW_KEY_S:
-				deceleratePressed = false;
-				break;
-			case GLFW_KEY_A:
-				rotateLeftPressed = false;
-				break;
-			case GLFW_KEY_D:
-				rotateRightPressed = false;
-				break;
-
 			default:
 			{
 			}
@@ -291,62 +233,51 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 }
 
 
-// Function called to animate elements in the scene
-void updateScene() {
+void mouseMoveHandler(GLFWwindow* window, double xpos, double ypos) {
 
-	planets.update();
+	if (mouseDown) {
 
-	// Update player
-	if (zoomInPressed) {
-		cameraZoom *= 0.9995f;
-	}
-	else if (zoomOutPressed) {
-		cameraZoom *= 1.0005f;
-	}
+		//cout << "x = " << xpos << ", y = " << ypos << endl;
+		double dx = xpos - prevMouseX;
+		double dy = ypos - prevMouseY;
 
-	// Update player orientation
-	if (rotateLeftPressed) {
+		if (mainCamera)
+			mainCamera->rotateCamera((float)-dy, (float)-dx);
 
-		playerOrientation += 0.05f;
-	}
-	else if (rotateRightPressed) {
-
-		playerOrientation -= 0.05f;
+		prevMouseX = xpos;
+		prevMouseY = ypos;
 	}
 
-	// Update player velocity
-	if (acceleratePressed) {
-
-		// calculate rotation matrix from orientation of player
-		mat4 R = rotate(identity<mat4>(), radians(playerOrientation), vec3(0.0f, 0.0f, 1.0f));
-		// get the x basis vector (the ship sprite points along the x axis when no rotation, so the x axis is the "forward" direction
-		vec4 xBasis = R[0];
-		// get the (x, y) elements to represent the direction vector we need to accelerate in (it's the direction the ship is pointing in)
-		float dx = xBasis.x;
-		float dy = xBasis.y;
-		// scale (dx, dy) and add to the velocity vector
-		playerVelocity.x += dx * 0.0000001f;
-		playerVelocity.y += dy * 0.0000001f;
-	}
-	else if (deceleratePressed) {
-
-		// calculate rotation matrix from orientation of player
-		mat4 R = rotate(identity<mat4>(), radians(playerOrientation), vec3(0.0f, 0.0f, 1.0f));
-		// get the x basis vector (the ship sprite points along the x axis when no rotation, so the x axis is the "forward" direction
-		vec4 xBasis = R[0];
-		// get the (x, y) elements to represent the direction vector we need to accelerate in.  For deceleration we set the vector to point in the opposite direction the ship is facing, so we negate the x, y values
-		float dx = -xBasis.x;
-		float dy = -xBasis.y;
-		// scale (dx, dy) and add to the velocity vector
-		playerVelocity.x += dx * 0.0000001f;
-		playerVelocity.y += dy * 0.0000001f;
-	}
-
-	// Update player position
-	playerPos.x += playerVelocity.x;
-	playerPos.y += playerVelocity.y;
-
-	// Centre camera on player
-	cameraPos.x = playerPos.x;
-	cameraPos.y = playerPos.y;
 }
+
+void mouseButtonHandler(GLFWwindow* window, int button, int action, int mods) {
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+
+		if (action == GLFW_PRESS) {
+
+			mouseDown = true;
+			glfwGetCursorPos(window, &prevMouseX, &prevMouseY);
+		}
+		else if (action == GLFW_RELEASE) {
+
+			mouseDown = false;
+		}
+	}
+}
+
+void mouseScrollHandler(GLFWwindow* window, double xoffset, double yoffset) {
+
+	if (mainCamera) {
+
+		if (yoffset < 0.0)
+			mainCamera->scaleRadius(1.1f);
+		else if (yoffset > 0.0)
+			mainCamera->scaleRadius(0.9f);
+	}
+}
+
+void mouseEnterHandler(GLFWwindow* window, int entered) {
+}
+
+#pragma endregion
