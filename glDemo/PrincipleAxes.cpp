@@ -104,12 +104,7 @@ CGPrincipleAxes::~CGPrincipleAxes() {
 }
 
 
-void CGPrincipleAxes::render(mat4 cameraTransform) {
-
-	// Setup transforms
-	// The principle axis is drawn where it's modelled, so there are no modelling transforms to apply
-	// Therefore, just pass the camera transform to OpenGL
-	glLoadMatrixf((GLfloat*)&cameraTransform);
+void CGPrincipleAxes::render(bool showZAxis) {
 
 	// Setup VBOs ready for rendering
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -124,7 +119,10 @@ void CGPrincipleAxes::render(mat4 cameraTransform) {
 
 	// Bind (and leave bound) the index array for drawing
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-	glDrawElements(GL_LINES, 20, GL_UNSIGNED_INT, (const GLvoid*)0);
+
+	int numElements = (showZAxis) ? 20 : 12;
+	glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, (const GLvoid*)0);
+
 
 	// Declare which arrays are needed for the semi-circle object
 	glDisableClientState(GL_VERTEX_ARRAY);

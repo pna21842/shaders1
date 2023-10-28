@@ -2,6 +2,8 @@
 
 #include "core.h"
 
+
+
 class CGPrincipleAxes  {
 
 private:
@@ -15,5 +17,5 @@ public:
 	CGPrincipleAxes();
 	~CGPrincipleAxes();
 
-	void render(glm::mat4 cameraTransform);
+	void render(bool showZAxis = true);
 };

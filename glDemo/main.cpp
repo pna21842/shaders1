@@ -5,6 +5,7 @@
 #include "PrincipleAxes.h"
 #include "AIMesh.h"
 #include "Cube.h"
+#include "2DExamples.h"
 
 
 using namespace std;
@@ -98,8 +99,7 @@ int main() {
 	//
 	// Setup Textures, VBOs and other scene objects
 	//
-
-	mainCamera = new ArcballCamera();
+	mainCamera = new ArcballCamera(0.0f, 0.0f, 1.98595f, 55.0f, 1.0f, 0.1f, 500.0f);
 	
 	principleAxes = new CGPrincipleAxes();
 
@@ -135,6 +135,24 @@ int main() {
 }
 
 
+// Used to show 2D content and expand view into 3D
+
+bool showViewplaneQuad = false;
+bool showPrincipleAxes = false;
+bool showZAxis = false;
+
+void demo_render2DStuff(mat4 cameraTransform) {
+
+	glLoadMatrixf((GLfloat*)&cameraTransform);
+
+	//render2D_triangle();
+	render2D_star();
+
+	if (showViewplaneQuad) {
+
+		render2D_quadOutline();
+	}
+}
 
 // renderScene - function to render the current scene
 void renderScene()
@@ -142,20 +160,26 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glPolygonMode(GL_FRONT, GL_FILL);
-	glPolygonMode(GL_BACK, GL_LINE);
-	glDisable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode(GL_FRONT, GL_FILL);
+	//glPolygonMode(GL_BACK, GL_LINE);
+	//glDisable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
+	//glEnable(GL_DEPTH_TEST);
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
+	demo_render2DStuff(cameraTransform);
+
 	// Render principle axes - no modelling transforms so just use cameraTransform
-	glLoadMatrixf((GLfloat*)&cameraTransform);
-	principleAxes->render(cameraTransform);
+	if (showPrincipleAxes) {
+
+		mat4 paTransform = cameraTransform * glm::scale(identity<mat4>(), vec3(0.8f, 0.8f, 0.8f));
+		glLoadMatrixf((GLfloat*)&paTransform);
+		principleAxes->render(showZAxis);
+	}
 
 	// Render cube - no modelling transform so leave cameraTransform set in OpenGL and render
-	cube->render();
+	//cube->render();
 
 
 #if 0
@@ -214,6 +238,18 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 		{
 			case GLFW_KEY_ESCAPE:
 				glfwSetWindowShouldClose(window, true);
+				break;
+			
+			case GLFW_KEY_V:
+				showViewplaneQuad = !showViewplaneQuad;
+				break;
+
+			case GLFW_KEY_A:
+				showPrincipleAxes = !showPrincipleAxes;
+				break;
+
+			case GLFW_KEY_Z:
+				showZAxis = !showZAxis;
 				break;
 
 			default:
@@ -274,6 +310,8 @@ void mouseScrollHandler(GLFWwindow* window, double xoffset, double yoffset) {
 			mainCamera->scaleRadius(1.1f);
 		else if (yoffset > 0.0)
 			mainCamera->scaleRadius(0.9f);
+
+		cout << mainCamera->getRadius() << endl;
 	}
 }
 

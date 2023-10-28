@@ -136,6 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="2DExamples.h" />
     <ClInclude Include="AIMesh.h" />
     <ClInclude Include="ArcballCamera.h" />
     <ClInclude Include="core.h" />
@@ -154,6 +155,7 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="2DExamples.cpp" />
     <ClCompile Include="AIMesh.cpp" />
     <ClCompile Include="ArcballCamera.cpp" />
     <ClCompile Include="core.cpp" />
