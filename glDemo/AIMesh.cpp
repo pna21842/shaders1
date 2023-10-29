@@ -9,6 +9,7 @@ using namespace glm;
 AIMesh::AIMesh(std::string filename, GLuint meshIndex) {
 
 	const struct aiScene* scene = aiImportFile(filename.c_str(),
+		aiProcess_GenSmoothNormals |
 		aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
 		aiProcess_JoinIdenticalVertices |

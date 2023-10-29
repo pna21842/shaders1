@@ -174,7 +174,7 @@ void renderScene()
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
-#if 1
+#if 0
 
 	demo_render2DStuff(cameraTransform);
 
@@ -197,7 +197,7 @@ void renderScene()
 
 #endif
 
-#if 0
+#if 1
 	
 	if (creatureMesh) {
 
