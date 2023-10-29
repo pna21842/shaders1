@@ -5,12 +5,12 @@ void render2D_triangle() {
 
 	glBegin(GL_TRIANGLES);
 
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.5f, -0.5f);
-	
 	glColor3ub(0, 255, 0);
 	glVertex2f(0.0f, 0.5f);
 
+	glColor3ub(255, 0, 0);
+	glVertex2f(-0.5f, -0.5f);
+	
 	glColor3ub(0, 0, 255);
 	glVertex2f(0.5f, -0.5f);
 

@@ -94,7 +94,16 @@ int main() {
 
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
+	glClearDepth(1.0f);
 
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_LINE);
+	
+	glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 
 	//
 	// Setup Textures, VBOs and other scene objects
@@ -135,9 +144,10 @@ int main() {
 }
 
 
-// Used to show 2D content and expand view into 3D
+// Demo code for studio - used to show 2D content and expand view into 3D
 
 bool showViewplaneQuad = false;
+bool showStar = true; // if false render triangle
 bool showPrincipleAxes = false;
 bool showZAxis = false;
 
@@ -145,9 +155,11 @@ void demo_render2DStuff(mat4 cameraTransform) {
 
 	glLoadMatrixf((GLfloat*)&cameraTransform);
 
-	//render2D_triangle();
-	render2D_star();
-
+	if (showStar)
+		render2D_star();
+	else
+		render2D_triangle();
+	
 	if (showViewplaneQuad) {
 
 		render2D_quadOutline();
@@ -160,13 +172,9 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//glPolygonMode(GL_FRONT, GL_FILL);
-	//glPolygonMode(GL_BACK, GL_LINE);
-	//glDisable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
-	//glEnable(GL_DEPTH_TEST);
-
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
+
+#if 1
 
 	demo_render2DStuff(cameraTransform);
 
@@ -178,11 +186,19 @@ void renderScene()
 		principleAxes->render(showZAxis);
 	}
 
-	// Render cube - no modelling transform so leave cameraTransform set in OpenGL and render
-	//cube->render();
-
+#endif
 
 #if 0
+
+	// Render cube - no modelling transform so leave cameraTransform set in OpenGL and render
+	glLoadMatrixf((GLfloat*)&cameraTransform);
+	glDisable(GL_CULL_FACE);
+	cube->render();
+
+#endif
+
+#if 0
+	
 	if (creatureMesh) {
 
 		// Setup transforms
@@ -240,6 +256,10 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 				glfwSetWindowShouldClose(window, true);
 				break;
 			
+			case GLFW_KEY_S:
+				showStar = !showStar;
+				break;
+
 			case GLFW_KEY_V:
 				showViewplaneQuad = !showViewplaneQuad;
 				break;
@@ -311,7 +331,7 @@ void mouseScrollHandler(GLFWwindow* window, double xoffset, double yoffset) {
 		else if (yoffset > 0.0)
 			mainCamera->scaleRadius(0.9f);
 
-		cout << mainCamera->getRadius() << endl;
+		//cout << mainCamera->getRadius() << endl;
 	}
 }
 
