@@ -174,7 +174,7 @@ void renderScene()
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
-#if 0
+#if 1
 
 	demo_render2DStuff(cameraTransform);
 
@@ -192,12 +192,11 @@ void renderScene()
 
 	// Render cube - no modelling transform so leave cameraTransform set in OpenGL and render
 	glLoadMatrixf((GLfloat*)&cameraTransform);
-	glDisable(GL_CULL_FACE);
 	cube->render();
 
 #endif
 
-#if 1
+#if 0
 	
 	if (creatureMesh) {
 
