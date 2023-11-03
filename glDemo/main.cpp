@@ -2,6 +2,7 @@
 #include "core.h"
 #include "TextureLoader.h"
 #include "ArcballCamera.h"
+#include "GUClock.h"
 #include "PrincipleAxes.h"
 #include "AIMesh.h"
 #include "Cube.h"
@@ -13,6 +14,8 @@ using namespace glm;
 
 
 #pragma region Global variables
+
+GUClock* gameClock = nullptr;
 
 // Main camera
 ArcballCamera* mainCamera = nullptr;
@@ -51,6 +54,8 @@ int main() {
 	// 1. Initialisation
 	//
 	
+	gameClock = new GUClock();
+
 #pragma region OpenGL and window setup
 
 	// Initialise glfw and setup window
@@ -62,7 +67,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
 
-	GLFWwindow* window = glfwCreateWindow(initWidth, initHeight, "Real-Time Computer Graphics", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(initWidth, initHeight, "CIS5013", NULL, NULL);
 
 	// Check window was created successfully
 	if (window == NULL)
@@ -137,9 +142,21 @@ int main() {
 		glfwSwapBuffers(window);			// Displays what was just rendered (using double buffering).
 
 		glfwPollEvents();					// Use this version when animating as fast as possible
+	
+		// update window title
+		char timingString[256];
+		sprintf_s(timingString, 256, "CIS5013: Average fps: %.0f; Average spf: %f", gameClock->averageFPS(), gameClock->averageSPF() / 1000.0f);
+		glfwSetWindowTitle(window, timingString);
 	}
 
 	glfwTerminate();
+
+	if (gameClock) {
+
+		gameClock->stop();
+		gameClock->reportTimingData();
+	}
+
 	return 0;
 }
 
@@ -174,7 +191,7 @@ void renderScene()
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
-#if 1
+#if 0
 
 	demo_render2DStuff(cameraTransform);
 
@@ -196,7 +213,7 @@ void renderScene()
 
 #endif
 
-#if 0
+#if 1
 	
 	if (creatureMesh) {
 
@@ -226,6 +243,14 @@ void renderScene()
 
 // Function called to animate elements in the scene
 void updateScene() {
+
+	float tDelta = 0.0f;
+
+	if (gameClock) {
+
+		gameClock->tick();
+		tDelta = (float)gameClock->gameTimeDelta();
+	}
 }
 
 
@@ -292,12 +317,13 @@ void mouseMoveHandler(GLFWwindow* window, double xpos, double ypos) {
 
 	if (mouseDown) {
 
-		//cout << "x = " << xpos << ", y = " << ypos << endl;
-		double dx = xpos - prevMouseX;
-		double dy = ypos - prevMouseY;
+		float tDelta = gameClock->gameTimeDelta();
+
+		float dx = float(xpos - prevMouseX) * 360.0f * tDelta;
+		float dy = float(ypos - prevMouseY) * 360.0f * tDelta;
 
 		if (mainCamera)
-			mainCamera->rotateCamera((float)-dy, (float)-dx);
+			mainCamera->rotateCamera(-dy, -dx);
 
 		prevMouseX = xpos;
 		prevMouseY = ypos;
@@ -329,8 +355,6 @@ void mouseScrollHandler(GLFWwindow* window, double xoffset, double yoffset) {
 			mainCamera->scaleRadius(1.1f);
 		else if (yoffset > 0.0)
 			mainCamera->scaleRadius(0.9f);
-
-		//cout << mainCamera->getRadius() << endl;
 	}
 }
 

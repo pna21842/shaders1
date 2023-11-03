@@ -146,6 +146,7 @@
     <ClInclude Include="GLFW\glfw3.h" />
     <ClInclude Include="GLFW\glfw3native.h" />
     <ClInclude Include="GL\glew.h" />
+    <ClInclude Include="GUClock.h" />
     <ClInclude Include="PlanetSystem.h" />
     <ClInclude Include="PrincipleAxes.h" />
     <ClInclude Include="RandomStars.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="ArcballCamera.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="GUClock.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlanetSystem.cpp" />
     <ClCompile Include="PrincipleAxes.cpp" />
