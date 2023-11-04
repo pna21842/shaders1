@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{ad5d344e-ae80-4d2c-8356-0f76eb1c25b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GL\glew.h">
@@ -33,19 +36,7 @@
     <ClInclude Include="FreeImage\FreeImagePlus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="star-vbo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RandomStars.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlanetSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextureLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TileMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureQuad.h">
@@ -63,10 +54,10 @@
     <ClInclude Include="Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="2DExamples.h">
+    <ClInclude Include="GUClock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GUClock.h">
+    <ClInclude Include="shader_setup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,19 +68,7 @@
     <ClCompile Include="core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="star-vbo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RandomStars.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlanetSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextureLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TileMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextureQuad.cpp">
@@ -107,11 +86,25 @@
     <ClCompile Include="Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="2DExamples.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GUClock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shader_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Assets\Shaders\basic_texture.fs.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Assets\Shaders\basic_texture.vs.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Assets\Shaders\basic_shader.fs.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Assets\Shaders\basic_shader.vs.txt">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

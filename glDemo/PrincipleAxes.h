@@ -17,5 +17,5 @@ public:
 	CGPrincipleAxes();
 	~CGPrincipleAxes();
 
-	void render(bool showZAxis = true);
+	void render();
 };

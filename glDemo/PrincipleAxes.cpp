@@ -1,9 +1,7 @@
 #include "PrincipleAxes.h"
 
-
 using namespace std;
 using namespace glm;
-
 
 // Example data for principle axes
 
@@ -104,29 +102,30 @@ CGPrincipleAxes::~CGPrincipleAxes() {
 }
 
 
-void CGPrincipleAxes::render(bool showZAxis) {
+void CGPrincipleAxes::render() {
 
 	// Setup VBOs ready for rendering
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glVertexPointer(4, GL_FLOAT, 0, (GLvoid*)0);
+	//glVertexPointer(4, GL_FLOAT, 0, (GLvoid*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
-	glColorPointer(4, GL_FLOAT, 0, (GLvoid*)0);
-
+	//glColorPointer(4, GL_FLOAT, 0, (GLvoid*)0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (const GLvoid*)0);
+	
 	// Declare which arrays are needed for the semi-circle object
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_COLOR_ARRAY);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	// Bind (and leave bound) the index array for drawing
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-	int numElements = (showZAxis) ? 20 : 12;
-	glDrawElements(GL_LINES, numElements, GL_UNSIGNED_INT, (const GLvoid*)0);
-
+	glDrawElements(GL_LINES, 20, GL_UNSIGNED_INT, (const GLvoid*)0);
 
 	// Declare which arrays are needed for the semi-circle object
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
+	//glDisableClientState(GL_VERTEX_ARRAY);
+	//glDisableClientState(GL_COLOR_ARRAY);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

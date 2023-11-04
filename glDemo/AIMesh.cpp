@@ -75,14 +75,18 @@ void AIMesh::preRender() {
 
 	// Setup VBOs ready for rendering
 	glBindBuffer(GL_ARRAY_BUFFER, meshVertexPosBuffer);
-	glVertexPointer(3, GL_FLOAT, 0, (GLvoid*)0);
-	glEnableClientState(GL_VERTEX_ARRAY);
+	//glVertexPointer(3, GL_FLOAT, 0, (GLvoid*)0);
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(0);
 
 	if (meshTexCoordBuffer != 0) {
 
 		glBindBuffer(GL_ARRAY_BUFFER, meshTexCoordBuffer);
-		glTexCoordPointer(3, GL_FLOAT, 0, (GLvoid*)0);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glTexCoordPointer(3, GL_FLOAT, 0, (GLvoid*)0);
+		//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+		glEnableVertexAttribArray(2);
 
 		if (textureID != 0) {
 			glEnable(GL_TEXTURE_2D);
@@ -103,11 +107,11 @@ void AIMesh::render() {
 
 void AIMesh::postRender() {
 
-	glDisableClientState(GL_VERTEX_ARRAY);
+	//glDisableClientState(GL_VERTEX_ARRAY);
 
 	if (meshTexCoordBuffer != 0) {
 	
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		if (textureID != 0) {
 			glDisable(GL_TEXTURE_2D);

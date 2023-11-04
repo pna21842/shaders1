@@ -1,12 +1,12 @@
 
 #include "core.h"
 #include "TextureLoader.h"
+#include "shader_setup.h"
 #include "ArcballCamera.h"
 #include "GUClock.h"
 #include "PrincipleAxes.h"
 #include "AIMesh.h"
 #include "Cube.h"
-#include "2DExamples.h"
 
 
 using namespace std;
@@ -29,6 +29,13 @@ CGPrincipleAxes* principleAxes = nullptr;
 Cube* cube = nullptr;
 AIMesh* creatureMesh = nullptr;
 AIMesh* planetMesh = nullptr;
+
+// Shaders
+GLuint				colourShader;
+GLuint				colourShader_mvpMatrix;
+
+GLuint				textureShader;
+GLuint				textureShader_mvpMatrix;
 
 // Window size
 const unsigned int initWidth = 512;
@@ -124,12 +131,20 @@ int main() {
 		creatureMesh->addTexture(string("Assets\\beast\\beast_texture.bmp"), FIF_BMP);
 	}
 
-
 	planetMesh = new AIMesh(string("Assets\\gsphere.obj"));
 	if (planetMesh) {
 		planetMesh->addTexture(string("Assets\\Textures\\Hodges_G_MountainRock1.jpg"), FIF_JPEG);
 	}
 
+
+	// Setup shaders
+	colourShader = setupShaders(string("Assets\\Shaders\\basic_shader.vs.txt"), string("Assets\\Shaders\\basic_shader.fs.txt"));
+	textureShader = setupShaders(string("Assets\\Shaders\\basic_texture.vs.txt"), string("Assets\\Shaders\\basic_texture.fs.txt"));
+
+
+	// Get uniform variable locations to set later
+	colourShader_mvpMatrix = glGetUniformLocation(colourShader, "mvpMatrix");
+	textureShader_mvpMatrix = glGetUniformLocation(textureShader, "mvpMatrix"); // sane varable but in different shader!
 
 	//
 	// 2. Main loop
@@ -161,28 +176,6 @@ int main() {
 }
 
 
-// Demo code for studio - used to show 2D content and expand view into 3D
-
-bool showViewplaneQuad = false;
-bool showStar = true; // if false render triangle
-bool showPrincipleAxes = false;
-bool showZAxis = false;
-
-void demo_render2DStuff(mat4 cameraTransform) {
-
-	glLoadMatrixf((GLfloat*)&cameraTransform);
-
-	if (showStar)
-		render2D_star();
-	else
-		render2D_triangle();
-	
-	if (showViewplaneQuad) {
-
-		render2D_quadOutline();
-	}
-}
-
 // renderScene - function to render the current scene
 void renderScene()
 {
@@ -191,34 +184,33 @@ void renderScene()
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
-#if 0
-
-	demo_render2DStuff(cameraTransform);
-
 	// Render principle axes - no modelling transforms so just use cameraTransform
-	if (showPrincipleAxes) {
+	mat4 paTransform = cameraTransform * glm::scale(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
+	
+	// Bind Shader and setup uniforms (this does what glLoadMatrix did previously...)
+	glUseProgram(colourShader);
+	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&paTransform);
 
-		mat4 paTransform = cameraTransform * glm::scale(identity<mat4>(), vec3(0.8f, 0.8f, 0.8f));
-		glLoadMatrixf((GLfloat*)&paTransform);
-		principleAxes->render(showZAxis);
-	}
+	principleAxes->render();
 
-#endif
+#if 1
 
-#if 0
-
-	// Render cube - no modelling transform so leave cameraTransform set in OpenGL and render
-	glLoadMatrixf((GLfloat*)&cameraTransform);
+	// Render cube (no modelling transforms so pass cameraTransform to mvpMatrix)...
+	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
 	cube->render();
+
+	glUseProgram(0);
 
 #endif
 
 #if 1
 	
+	glUseProgram(textureShader);
+
 	if (creatureMesh) {
 
 		// Setup transforms
-		glLoadMatrixf((GLfloat*)&cameraTransform);
+		glUniformMatrix4fv(textureShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
 
 		creatureMesh->preRender();
 		creatureMesh->render();
@@ -230,7 +222,8 @@ void renderScene()
 		// Setup transforms
 		mat4 planetTranslate = translate(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
 		mat4 T = cameraTransform * planetTranslate;
-		glLoadMatrixf((GLfloat*)&T);
+		
+		glUniformMatrix4fv(textureShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&T);
 
 		planetMesh->preRender();
 		planetMesh->render();
@@ -280,22 +273,6 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 				glfwSetWindowShouldClose(window, true);
 				break;
 			
-			case GLFW_KEY_S:
-				showStar = !showStar;
-				break;
-
-			case GLFW_KEY_V:
-				showViewplaneQuad = !showViewplaneQuad;
-				break;
-
-			case GLFW_KEY_A:
-				showPrincipleAxes = !showPrincipleAxes;
-				break;
-
-			case GLFW_KEY_Z:
-				showZAxis = !showZAxis;
-				break;
-
 			default:
 			{
 			}
@@ -317,10 +294,8 @@ void mouseMoveHandler(GLFWwindow* window, double xpos, double ypos) {
 
 	if (mouseDown) {
 
-		//float tDelta = gameClock->gameTimeDelta();
-
-		float dx = float(xpos - prevMouseX);// *360.0f * tDelta;
-		float dy = float(ypos - prevMouseY);// *360.0f * tDelta;
+		float dx = float(xpos - prevMouseX);
+		float dy = float(ypos - prevMouseY);
 
 		if (mainCamera)
 			mainCamera->rotateCamera(-dy, -dx);

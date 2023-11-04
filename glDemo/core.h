@@ -18,9 +18,12 @@
 #include <assert.h>
 #include <math.h>
 #include <iostream>
+#include <fstream>
 #include <random>
 #include <vector>
 #include <string>
+#include <map>
+#include <set>
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
 #include <glm\vec4.hpp>

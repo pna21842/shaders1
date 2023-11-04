@@ -136,7 +136,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="2DExamples.h" />
     <ClInclude Include="AIMesh.h" />
     <ClInclude Include="ArcballCamera.h" />
     <ClInclude Include="core.h" />
@@ -147,29 +146,28 @@
     <ClInclude Include="GLFW\glfw3native.h" />
     <ClInclude Include="GL\glew.h" />
     <ClInclude Include="GUClock.h" />
-    <ClInclude Include="PlanetSystem.h" />
     <ClInclude Include="PrincipleAxes.h" />
-    <ClInclude Include="RandomStars.h" />
-    <ClInclude Include="star-vbo.h" />
+    <ClInclude Include="shader_setup.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TextureQuad.h" />
-    <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="2DExamples.cpp" />
     <ClCompile Include="AIMesh.cpp" />
     <ClCompile Include="ArcballCamera.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="GUClock.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PlanetSystem.cpp" />
     <ClCompile Include="PrincipleAxes.cpp" />
-    <ClCompile Include="RandomStars.cpp" />
-    <ClCompile Include="star-vbo.cpp" />
+    <ClCompile Include="shader_setup.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TextureQuad.cpp" />
-    <ClCompile Include="TileMap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Assets\Shaders\basic_shader.fs.txt" />
+    <Text Include="Assets\Shaders\basic_shader.vs.txt" />
+    <Text Include="Assets\Shaders\basic_texture.fs.txt" />
+    <Text Include="Assets\Shaders\basic_texture.vs.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
