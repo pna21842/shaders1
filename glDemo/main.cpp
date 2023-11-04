@@ -317,10 +317,10 @@ void mouseMoveHandler(GLFWwindow* window, double xpos, double ypos) {
 
 	if (mouseDown) {
 
-		float tDelta = gameClock->gameTimeDelta();
+		//float tDelta = gameClock->gameTimeDelta();
 
-		float dx = float(xpos - prevMouseX) * 360.0f * tDelta;
-		float dy = float(ypos - prevMouseY) * 360.0f * tDelta;
+		float dx = float(xpos - prevMouseX);// *360.0f * tDelta;
+		float dy = float(ypos - prevMouseY);// *360.0f * tDelta;
 
 		if (mainCamera)
 			mainCamera->rotateCamera(-dy, -dx);
