@@ -60,6 +60,9 @@
     <ClInclude Include="shader_setup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tetrahedron.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -90,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shader_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tetrahedron.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -148,6 +148,7 @@
     <ClInclude Include="GUClock.h" />
     <ClInclude Include="PrincipleAxes.h" />
     <ClInclude Include="shader_setup.h" />
+    <ClInclude Include="Tetrahedron.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TextureQuad.h" />
   </ItemGroup>
@@ -160,6 +161,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PrincipleAxes.cpp" />
     <ClCompile Include="shader_setup.cpp" />
+    <ClCompile Include="Tetrahedron.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TextureQuad.cpp" />
   </ItemGroup>

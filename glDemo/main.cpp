@@ -7,6 +7,7 @@
 #include "PrincipleAxes.h"
 #include "AIMesh.h"
 #include "Cube.h"
+#include "Tetrahedron.h"
 
 
 using namespace std;
@@ -29,13 +30,15 @@ CGPrincipleAxes* principleAxes = nullptr;
 Cube* cube = nullptr;
 AIMesh* creatureMesh = nullptr;
 AIMesh* planetMesh = nullptr;
+Tetrahedron* tetra1 = nullptr;
+
 
 // Shaders
 GLuint				colourShader;
 GLuint				colourShader_mvpMatrix;
 
 GLuint				textureShader;
-GLuint				textureShader_mvpMatrix;
+GLuint				textureShader_transformMat;
 
 // Window size
 const unsigned int initWidth = 512;
@@ -126,6 +129,8 @@ int main() {
 
 	cube = new Cube();
 
+	tetra1 = new Tetrahedron();
+
 	creatureMesh = new AIMesh(string("Assets\\beast\\beast.obj"));
 	if (creatureMesh) {
 		creatureMesh->addTexture(string("Assets\\beast\\beast_texture.bmp"), FIF_BMP);
@@ -144,7 +149,7 @@ int main() {
 
 	// Get uniform variable locations to set later
 	colourShader_mvpMatrix = glGetUniformLocation(colourShader, "mvpMatrix");
-	textureShader_mvpMatrix = glGetUniformLocation(textureShader, "mvpMatrix"); // sane varable but in different shader!
+	textureShader_transformMat = glGetUniformLocation(textureShader, "transformMat"); // sane varable but in different shader!
 
 	//
 	// 2. Main loop
@@ -184,6 +189,15 @@ void renderScene()
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
+	glUseProgram(colourShader);
+	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
+
+	tetra1->render();
+
+	glUseProgram(0);
+
+#if 0
+
 	// Render principle axes - no modelling transforms so just use cameraTransform
 	mat4 paTransform = cameraTransform * glm::scale(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
 	
@@ -193,7 +207,7 @@ void renderScene()
 
 	principleAxes->render();
 
-#if 1
+
 
 	// Render cube (no modelling transforms so pass cameraTransform to mvpMatrix)...
 	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
@@ -201,16 +215,13 @@ void renderScene()
 
 	glUseProgram(0);
 
-#endif
-
-#if 1
 	
 	glUseProgram(textureShader);
 
 	if (creatureMesh) {
 
 		// Setup transforms
-		glUniformMatrix4fv(textureShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
+		glUniformMatrix4fv(textureShader_transformMat, 1, GL_FALSE, (GLfloat*)&cameraTransform);
 
 		creatureMesh->preRender();
 		creatureMesh->render();
@@ -223,7 +234,7 @@ void renderScene()
 		mat4 planetTranslate = translate(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
 		mat4 T = cameraTransform * planetTranslate;
 		
-		glUniformMatrix4fv(textureShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&T);
+		glUniformMatrix4fv(textureShader_transformMat, 1, GL_FALSE, (GLfloat*)&T);
 
 		planetMesh->preRender();
 		planetMesh->render();
