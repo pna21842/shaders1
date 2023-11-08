@@ -1,5 +1,9 @@
 #version 410
 
+//
+// Example screen space rendering effect producing a blue, stripped effect
+//
+
 uniform mat4 mvpMatrix;
 
 layout (location=0) in vec4 vertexPos;
