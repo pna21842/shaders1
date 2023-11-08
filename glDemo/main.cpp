@@ -143,7 +143,7 @@ int main() {
 
 
 	// Setup shaders
-	colourShader = setupShaders(string("Assets\\Shaders\\basic_shader.vs.txt"), string("Assets\\Shaders\\basic_shader.fs.txt"));
+	colourShader = setupShaders(string("Assets\\Shaders\\effect1.vs.txt"), string("Assets\\Shaders\\effect1.fs.txt"));
 	textureShader = setupShaders(string("Assets\\Shaders\\basic_texture.vs.txt"), string("Assets\\Shaders\\basic_texture.fs.txt"));
 
 

@@ -170,6 +170,8 @@
     <Text Include="Assets\Shaders\basic_shader.vs.txt" />
     <Text Include="Assets\Shaders\basic_texture.fs.txt" />
     <Text Include="Assets\Shaders\basic_texture.vs.txt" />
+    <Text Include="Assets\Shaders\effect1.fs.txt" />
+    <Text Include="Assets\Shaders\effect1.vs.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
