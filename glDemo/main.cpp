@@ -40,9 +40,14 @@ GLuint				colourShader_mvpMatrix;
 GLuint				textureShader;
 GLuint				textureShader_transformMat;
 
+GLuint				redGreenShader;
+GLuint				redGreenShader_mvpMatrix;
+GLuint				redGreenShader_screenHeight;
+
+
 // Window size
-const unsigned int initWidth = 512;
-const unsigned int initHeight = 512;
+unsigned int windowWidth = 512;
+unsigned int windowHeight = 512;
 
 #pragma endregion
 
@@ -77,7 +82,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
 
-	GLFWwindow* window = glfwCreateWindow(initWidth, initHeight, "CIS5013", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "CIS5013", NULL, NULL);
 
 	// Check window was created successfully
 	if (window == NULL)
@@ -102,7 +107,7 @@ int main() {
 
 	
 	// Setup window's initial size
-	resizeWindow(window, initWidth, initHeight);
+	resizeWindow(window, windowWidth, windowHeight);
 
 #pragma endregion
 
@@ -145,11 +150,14 @@ int main() {
 	// Setup shaders
 	colourShader = setupShaders(string("Assets\\Shaders\\effect1.vs.txt"), string("Assets\\Shaders\\effect1.fs.txt"));
 	textureShader = setupShaders(string("Assets\\Shaders\\basic_texture.vs.txt"), string("Assets\\Shaders\\basic_texture.fs.txt"));
-
+	redGreenShader = setupShaders(string("Assets\\Shaders\\red-green-effect.vert"), string("Assets\\Shaders\\red-green-effect.frag"));;
 
 	// Get uniform variable locations to set later
 	colourShader_mvpMatrix = glGetUniformLocation(colourShader, "mvpMatrix");
 	textureShader_transformMat = glGetUniformLocation(textureShader, "transformMat"); // sane varable but in different shader!
+	redGreenShader_mvpMatrix = glGetUniformLocation(redGreenShader, "mvpMatrix");
+	redGreenShader_screenHeight = glGetUniformLocation(redGreenShader, "screenHeight");
+
 
 	//
 	// 2. Main loop
@@ -189,59 +197,20 @@ void renderScene()
 
 	mat4 cameraTransform = mainCamera->projectionTransform() * mainCamera->viewTransform();
 
-	glUseProgram(colourShader);
-	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
+	glUseProgram(redGreenShader);
+	glUniformMatrix4fv(redGreenShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
+	glUniform1i(redGreenShader_screenHeight, windowHeight);
 
 	tetra1->render();
 
-	glUseProgram(0);
-
-#if 0
-
-	// Render principle axes - no modelling transforms so just use cameraTransform
-	mat4 paTransform = cameraTransform * glm::scale(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
-	
-	// Bind Shader and setup uniforms (this does what glLoadMatrix did previously...)
+	/*
+	mat4 T = cameraTransform * glm::translate(identity<mat4>(), vec3(3.0, 0.0, 3.0));
 	glUseProgram(colourShader);
-	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&paTransform);
-
-	principleAxes->render();
-
-
-
-	// Render cube (no modelling transforms so pass cameraTransform to mvpMatrix)...
-	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&cameraTransform);
-	cube->render();
+	glUniformMatrix4fv(colourShader_mvpMatrix, 1, GL_FALSE, (GLfloat*)&T);
+	tetra1->render();
+	*/
 
 	glUseProgram(0);
-
-	
-	glUseProgram(textureShader);
-
-	if (creatureMesh) {
-
-		// Setup transforms
-		glUniformMatrix4fv(textureShader_transformMat, 1, GL_FALSE, (GLfloat*)&cameraTransform);
-
-		creatureMesh->preRender();
-		creatureMesh->render();
-		creatureMesh->postRender();
-	}
-	
-	if (planetMesh) {
-
-		// Setup transforms
-		mat4 planetTranslate = translate(identity<mat4>(), vec3(2.0f, 2.0f, 2.0f));
-		mat4 T = cameraTransform * planetTranslate;
-		
-		glUniformMatrix4fv(textureShader_transformMat, 1, GL_FALSE, (GLfloat*)&T);
-
-		planetMesh->preRender();
-		planetMesh->render();
-		planetMesh->postRender();
-	}
-#endif
-
 }
 
 
@@ -269,6 +238,9 @@ void resizeWindow(GLFWwindow* window, int width, int height)
 	}
 
 	glViewport(0, 0, width, height);		// Draw into entire window
+
+	windowWidth = width;
+	windowHeight = height;
 }
 
 
